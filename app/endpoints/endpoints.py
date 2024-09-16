@@ -2,9 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import crud, schemas
 from app.database import SessionLocal
+from typing import List
 
 # Crear un router para clientes
 clientes_router = APIRouter()
+# Crear un router para mesas
+mesas_router = APIRouter()
+# Crear un router para pedidos
+pedidos_router = APIRouter()
 
 # Dependencia para obtener la sesión de base de datos
 def get_db():
@@ -41,8 +46,6 @@ def delete_cliente(cliente_id: int, db: Session = Depends(get_db)):
     crud.delete_cliente(db, cliente_id)
     return {"detail": "Cliente eliminado"}
 
-# Crear un router para mesas
-mesas_router = APIRouter()
 
 @mesas_router.post("/mesas/", response_model=schemas.Mesa)
 def create_mesa(mesa_data: schemas.MesaCreate, db: Session = Depends(get_db)):
@@ -70,3 +73,24 @@ def update_mesa(mesa_id: int, mesa_data: schemas.MesaUpdate, db: Session = Depen
 def delete_mesa(mesa_id: int, db: Session = Depends(get_db)):
     crud.delete_mesa(db, mesa_id)
     return {"detail": "Mesa eliminada"}
+
+
+@pedidos_router.post("/pedidos/", response_model=schemas.Pedido, tags=["pedidos"])
+def create_pedido(pedido: schemas.PedidoCreate, db: Session = Depends(get_db)):
+    return crud.create_pedido(db=db, pedido=pedido)
+
+@pedidos_router.get("/pedidos/", response_model=List[schemas.Pedido], tags=["pedidos"])
+def read_pedidos(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return crud.get_pedidos(db, skip=skip, limit=limit)
+
+@pedidos_router.get("/pedidos/{pedido_id}", response_model=schemas.Pedido, tags=["pedidos"])
+def read_pedido(pedido_id: int, db: Session = Depends(get_db)):
+    return crud.get_pedido(db, pedido_id=pedido_id)
+
+@pedidos_router.put("/pedidos/{pedido_id}", response_model=schemas.Pedido, tags=["pedidos"])
+def update_pedido(pedido_id: int, pedido: schemas.PedidoUpdate, db: Session = Depends(get_db)):
+    return crud.update_pedido(db=db, pedido_id=pedido_id, pedido=pedido)
+
+@pedidos_router.delete("/pedidos/{pedido_id}", tags=["pedidos"])
+def delete_pedido(pedido_id: int, db: Session = Depends(get_db)):
+    return crud.delete_pedido(db=db, pedido_id=pedido_id)

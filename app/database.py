@@ -5,9 +5,10 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 MYSQL_USER = "root"
 MYSQL_PASSWORD = "123"
 MYSQL_HOST = "127.0.0.1"  # o la IP de tu servidor MySQL
-MYSQL_DATABASE = "bodegon"
+MYSQL_PORT = "3306" 
+MYSQL_DATABASE = "bodegon3"
 
-SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DATABASE}"
+SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
 # Crear una instancia de motor para la base de datos
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

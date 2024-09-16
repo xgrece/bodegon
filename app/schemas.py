@@ -27,9 +27,9 @@ class Cliente(ClienteBase):
 
 #---------------------- M E S A ----------------------------------------------------------
 class MesaBase(BaseModel):
-    numero: int
+    numero_mesa: int
     capacidad: int
-    estado: str
+    disponible: bool
 
 class MesaCreate(MesaBase):
     pass
@@ -83,20 +83,21 @@ class Combo(ComboBase):
 
 #---------------------- P E D I D O ------------------------------------------------------
 class PedidoBase(BaseModel):
-    # Aquí defines los atributos que van en el schema básico de Pedido
-    # Por ejemplo:
-    id: int
     cantidad: int
     producto: str
-    # Otros campos...
+    # Puedes agregar más campos si tienes relaciones, por ejemplo, cliente_id, combo_id, etc.
 
 class PedidoCreate(PedidoBase):
-    # Define cualquier campo adicional necesario para la creación
+    pass
+
+class PedidoUpdate(PedidoBase):
     pass
 
 class Pedido(PedidoBase):
     id: int
-    # Incluye relaciones si las necesitas
+    # Relaciones, si es necesario
+    cliente_id: int  # si está relacionado con cliente, por ejemplo
+    combo_id: Optional[int] = None  # si aplica
     class Config:
         from_attributes = True
 
