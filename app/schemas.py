@@ -9,8 +9,9 @@ from datetime import date, time
 #---------------------- C L I E N T E ----------------------------------------------------
 class ClienteBase(BaseModel):
     nombre: str
+    apellido: str
     email: str
-    telefono: Optional[str] = None
+    #telefono: Optional[str] = None
 
 class ClienteCreate(ClienteBase):
     pass

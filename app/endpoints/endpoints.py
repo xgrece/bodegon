@@ -1,15 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Request, Form, Depends, HTTPException
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-from app import crud, schemas
 from app.database import SessionLocal
-from typing import List
+from app import crud, schemas
+from fastapi.templating import Jinja2Templates
 
-# Crear un router para clientes
-clientes_router = APIRouter()
-# Crear un router para mesas
-mesas_router = APIRouter()
-# Crear un router para pedidos
-pedidos_router = APIRouter()
+# Crear un router principal
+router = APIRouter()
+
+# Crear un objeto Jinja2Templates
+templates = Jinja2Templates(directory="app/templates")
 
 # Dependencia para obtener la sesión de base de datos
 def get_db():
@@ -19,78 +19,105 @@ def get_db():
     finally:
         db.close()
 
-@clientes_router.post("/clientes/", response_model=schemas.Cliente)
-def create_cliente(cliente_data: schemas.ClienteCreate, db: Session = Depends(get_db)):
-    return crud.create_cliente(db, cliente_data)
+#=============================== CLIENTES ================================================
 
-@clientes_router.get("/clientes/{cliente_id}", response_model=schemas.Cliente)
-def read_cliente(cliente_id: int, db: Session = Depends(get_db)):
+
+# Crear un cliente (POST)
+@router.post("/clientes/", response_class=HTMLResponse, tags=["Clientes"])
+async def create_cliente(
+    request: Request,
+    nombre: str = Form(...),
+    apellido: str = Form(...),
+    email: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    cliente_data = schemas.ClienteCreate(nombre=nombre, apellido=apellido, email=email)
+    cliente = crud.create_cliente(db, cliente_data)
+    return templates.TemplateResponse("cliente.html", {"request": request, "cliente": cliente})
+
+# Leer un cliente (GET)
+@router.get("/clientes/{cliente_id}", response_class=HTMLResponse, tags=["Clientes"])
+async def read_cliente(request: Request, cliente_id: int, db: Session = Depends(get_db)):
     cliente = crud.get_cliente(db, cliente_id)
     if cliente is None:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
-    return cliente
+    return templates.TemplateResponse("cliente.html", {"request": request, "cliente": cliente})
 
-@clientes_router.get("/clientes/", response_model=list[schemas.Cliente])
-def read_all_clientes(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return crud.get_all_clientes(db, skip=skip, limit=limit)
+# Leer todos los clientes (GET)
+@router.get("/clientes/", response_class=HTMLResponse, tags=["Clientes"])
+async def read_all_clientes(request: Request, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    clientes = crud.get_all_clientes(db, skip=skip, limit=limit)
+    return templates.TemplateResponse("clientes.html", {"request": request, "clientes": clientes})
 
-@clientes_router.put("/clientes/{cliente_id}", response_model=schemas.Cliente)
-def update_cliente(cliente_id: int, cliente_data: schemas.ClienteUpdate, db: Session = Depends(get_db)):
-    cliente = crud.update_cliente(db, cliente_id, cliente_data.dict())
+# Actualizar un cliente (PUT)
+@router.put("/clientes/{cliente_id}", response_class=HTMLResponse, tags=["Clientes"])
+async def update_cliente(
+    request: Request,
+    cliente_id: int,
+    nombre: str = Form(...),
+    apellido: str = Form(...),
+    email: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    cliente_data = schemas.ClienteUpdate(nombre=nombre, apellido=apellido, email=email)
+    cliente = crud.update_cliente(db, cliente_id, cliente_data)
     if cliente is None:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
-    return cliente
+    return templates.TemplateResponse("cliente.html", {"request": request, "cliente": cliente})
 
-@clientes_router.delete("/clientes/{cliente_id}", response_model=dict)
-def delete_cliente(cliente_id: int, db: Session = Depends(get_db)):
+# Eliminar un cliente (DELETE)
+@router.delete("/clientes/{cliente_id}", response_class=HTMLResponse, tags=["Clientes"])
+async def delete_cliente(request: Request, cliente_id: int, db: Session = Depends(get_db)):
     crud.delete_cliente(db, cliente_id)
-    return {"detail": "Cliente eliminado"}
+    return templates.TemplateResponse("clientes.html", {"request": request, "message": "Cliente eliminado"})
 
 
-@mesas_router.post("/mesas/", response_model=schemas.Mesa)
-def create_mesa(mesa_data: schemas.MesaCreate, db: Session = Depends(get_db)):
-    return crud.create_mesa(db, mesa_data)
 
-@mesas_router.get("/mesas/{mesa_id}", response_model=schemas.Mesa)
-def read_mesa(mesa_id: int, db: Session = Depends(get_db)):
+
+
+#======================================= MESAS ========================================
+@router.post("/mesas/", response_class=HTMLResponse, tags=["Mesas"])
+def create_mesa(request: Request, mesa_data: schemas.MesaCreate, db: Session = Depends(get_db)):
+    mesa = crud.create_mesa(db, mesa_data)
+    return templates.TemplateResponse("mesa.html", {"request": request, "mesa": mesa})
+
+@router.get("/mesas/{mesa_id}", response_class=HTMLResponse, tags=["Mesas"])
+def read_mesa(request: Request, mesa_id: int, db: Session = Depends(get_db)):
     mesa = crud.get_mesa(db, mesa_id)
     if mesa is None:
         raise HTTPException(status_code=404, detail="Mesa no encontrada")
-    return mesa
+    return templates.TemplateResponse("mesa.html", {"request": request, "mesa": mesa})
 
-@mesas_router.get("/mesas/", response_model=list[schemas.Mesa])
-def read_all_mesas(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return crud.get_all_mesas(db, skip=skip, limit=limit)
+@router.get("/mesas/", response_class=HTMLResponse, tags=["Mesas"])
+def read_all_mesas(request: Request, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    mesas = crud.get_all_mesas(db, skip=skip, limit=limit)
+    return templates.TemplateResponse("mesas.html", {"request": request, "mesas": mesas})
 
-@mesas_router.put("/mesas/{mesa_id}", response_model=schemas.Mesa)
-def update_mesa(mesa_id: int, mesa_data: schemas.MesaUpdate, db: Session = Depends(get_db)):
-    mesa = crud.update_mesa(db, mesa_id, mesa_data.dict())
+@router.put("/mesas/{mesa_id}", response_class=HTMLResponse, tags=["Mesas"])
+def update_mesa(request: Request, mesa_id: int, mesa_data: schemas.MesaUpdate, db: Session = Depends(get_db)):
+    mesa = crud.update_mesa(db, mesa_id, mesa_data)
     if mesa is None:
         raise HTTPException(status_code=404, detail="Mesa no encontrada")
-    return mesa
+    return templates.TemplateResponse("mesa.html", {"request": request, "mesa": mesa})
 
-@mesas_router.delete("/mesas/{mesa_id}", response_model=dict)
-def delete_mesa(mesa_id: int, db: Session = Depends(get_db)):
+@router.delete("/mesas/{mesa_id}", response_class=HTMLResponse, tags=["Mesas"])
+def delete_mesa(request: Request, mesa_id: int, db: Session = Depends(get_db)):
     crud.delete_mesa(db, mesa_id)
-    return {"detail": "Mesa eliminada"}
+    return templates.TemplateResponse("mesas.html", {"request": request, "message": "Mesa eliminada"})
 
 
-@pedidos_router.post("/pedidos/", response_model=schemas.Pedido, tags=["pedidos"])
-def create_pedido(pedido: schemas.PedidoCreate, db: Session = Depends(get_db)):
-    return crud.create_pedido(db=db, pedido=pedido)
 
-@pedidos_router.get("/pedidos/", response_model=List[schemas.Pedido], tags=["pedidos"])
-def read_pedidos(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return crud.get_pedidos(db, skip=skip, limit=limit)
 
-@pedidos_router.get("/pedidos/{pedido_id}", response_model=schemas.Pedido, tags=["pedidos"])
-def read_pedido(pedido_id: int, db: Session = Depends(get_db)):
-    return crud.get_pedido(db, pedido_id=pedido_id)
 
-@pedidos_router.put("/pedidos/{pedido_id}", response_model=schemas.Pedido, tags=["pedidos"])
-def update_pedido(pedido_id: int, pedido: schemas.PedidoUpdate, db: Session = Depends(get_db)):
-    return crud.update_pedido(db=db, pedido_id=pedido_id, pedido=pedido)
+#======================================= PEDIDOS ========================================
+# Lista global para almacenar los pedidos
+pedidos = []
 
-@pedidos_router.delete("/pedidos/{pedido_id}", tags=["pedidos"])
-def delete_pedido(pedido_id: int, db: Session = Depends(get_db)):
-    return crud.delete_pedido(db=db, pedido_id=pedido_id)
+@router.post("/create_pedido", response_class=HTMLResponse, tags=["Pedidos"])
+async def create_pedido(request: Request, mesa: int = Form(...), producto: str = Form(...)):
+    pedidos.append({"mesa": mesa, "producto": producto})
+    return templates.TemplateResponse("pedido.html", {"request": request, "pedidos": pedidos, "message": "Pedido creado exitosamente!"})
+
+@router.get("/pedido", response_class=HTMLResponse, tags=["Pedidos"])
+async def read_pedido(request: Request):
+    return templates.TemplateResponse("pedido.html", {"request": request, "pedidos": pedidos})

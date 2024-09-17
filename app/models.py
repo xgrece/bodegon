@@ -10,6 +10,7 @@ class Cliente(Base):
     __tablename__ = 'clientes'
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(250), index=True)
+    apellido = Column(String, index=True)
     email = Column(String(250), unique=True, index=True)
     telefono = Column(String(15), index=True)
     reservas = relationship("Reserva", back_populates="cliente")
@@ -49,8 +50,8 @@ class Mesa(Base):
     id = Column(Integer, primary_key=True, index=True)
     numero_mesa = Column(Integer, unique=True, index=True)
     capacidad = Column(Integer)
-    ubicacion = Column(String(250))
     disponible = Column(Boolean, default=True)
+    ubicacion = Column(String(250))
     reservas = relationship("Reserva", back_populates="mesa")
     pedidos = relationship("Pedido", back_populates="mesa")
     

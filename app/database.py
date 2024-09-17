@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from contextlib import contextmanager
 
 # Reemplaza estos valores con tus credenciales de MySQL
 MYSQL_USER = "root"
@@ -17,8 +18,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base para la creación de modelos de datos
 Base = declarative_base()
 
-Base.metadata.create_all(bind=engine)
+# Crear todas las tablas
+#Base.metadata.create_all(bind=engine)
 
+
+# Test de conexión
 if __name__ == "__main__":
     try:
         # Intenta crear una sesión y cerrar la conexión
