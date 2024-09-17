@@ -22,8 +22,13 @@ def get_db():
 #=============================== CLIENTES ================================================
 
 
-# Crear un cliente (POST)
-@router.post("/clientes/", response_class=HTMLResponse, tags=["Clientes"])
+
+# Endpoint GET para mostrar el formulario
+@router.get("/crear_cliente", response_class=HTMLResponse)
+async def show_create_cliente_form(request: Request):
+    return templates.TemplateResponse("crear_cliente.html", {"request": request})
+
+@router.post("/crear_cliente", response_class=HTMLResponse)
 async def create_cliente(
     request: Request,
     nombre: str = Form(...),
@@ -33,7 +38,11 @@ async def create_cliente(
 ):
     cliente_data = schemas.ClienteCreate(nombre=nombre, apellido=apellido, email=email)
     cliente = crud.create_cliente(db, cliente_data)
-    return templates.TemplateResponse("cliente.html", {"request": request, "cliente": cliente})
+    return templates.TemplateResponse("crear_cliente.html", {
+        "request": request, 
+        "message": f"Cliente {nombre} {apellido} creado exitosamente"
+    })
+
 
 # Leer un cliente (GET)
 @router.get("/clientes/{cliente_id}", response_class=HTMLResponse, tags=["Clientes"])
