@@ -1,14 +1,21 @@
 from sqlalchemy.orm import Session
 from .models import Cliente, Mesa
 from .schemas import ClienteCreate, ClienteUpdate, MesaCreate, MesaUpdate, PedidoCreate, Pedido, PedidoUpdate
-from . import models
+from app import models, schemas
+from sqlalchemy.exc import IntegrityError
 
-def create_cliente(db: Session, cliente_data: ClienteCreate):
-    db_cliente = Cliente(**cliente_data.dict())
-    db.add(db_cliente)
-    db.commit()
-    db.refresh(db_cliente)
-    return db_cliente
+
+def create_cliente(db: Session, cliente_data: schemas.ClienteCreate):
+    nuevo_cliente = models.Cliente(**cliente_data.dict())
+    db.add(nuevo_cliente)
+    try:
+        db.commit()
+        db.refresh(nuevo_cliente)
+        return nuevo_cliente
+    except IntegrityError:
+        db.rollback()
+        raise ValueError(f"El cliente con el email {cliente_data.email} ya existe.")
+
 
 def get_cliente(db: Session, cliente_id: int):
     return db.query(Cliente).filter(Cliente.id == cliente_id).first()
@@ -34,8 +41,8 @@ def delete_cliente(db: Session, cliente_id: int):
         return {"message": "Cliente eliminado"}
     return {"message": "Cliente no encontrado"}
 
-def create_mesa(db: Session, mesa_data: MesaCreate):
-    db_mesa = Mesa(**mesa_data.dict())
+def create_mesa(db: Session, mesa_data: schemas.MesaCreate):
+    db_mesa = models.Mesa(**mesa_data.dict())
     db.add(db_mesa)
     db.commit()
     db.refresh(db_mesa)
