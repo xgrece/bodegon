@@ -26,6 +26,15 @@ def get_db():
 async def show_create_cliente_form(request: Request):
     return templates.TemplateResponse("crear_cliente.html", {"request": request})
 
+<<<<<<< HEAD
+=======
+
+# Endpoint GET para mostrar el formulario
+@router.get("/crear_cliente", response_class=HTMLResponse)
+async def show_create_cliente_form(request: Request):
+    return templates.TemplateResponse("crear_cliente.html", {"request": request})
+
+>>>>>>> 064548502e1714fe104b9fcdf5c5b034cea2e549
 @router.post("/crear_cliente", response_class=HTMLResponse)
 async def create_cliente(
     request: Request,
@@ -40,11 +49,15 @@ async def create_cliente(
         "request": request, 
         "message": f"Cliente {nombre} {apellido} creado exitosamente"
     })
+<<<<<<< HEAD
     
 @router.get("/read_clientes", response_class=HTMLResponse)
 async def read_clientes(request: Request, db: Session = Depends(get_db)):
     clientes = crud.get_all_clientes(db)
     return templates.TemplateResponse("read_clientes.html", {"request": request, "clientes": clientes})
+=======
+
+>>>>>>> 064548502e1714fe104b9fcdf5c5b034cea2e549
 
 # Obtener un cliente por ID (GET)
 @router.get("/clientes/{cliente_id}", response_class=HTMLResponse)
