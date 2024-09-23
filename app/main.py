@@ -50,7 +50,7 @@ async def read_root(request: Request):
 def test_endpoint():
     return {"message": "Server is working"}
 
-#---------------------- I C O N ---------------------------------------------------------  
+#============================ I C O N ======================================== 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("app/static/assets/favicon.ico")

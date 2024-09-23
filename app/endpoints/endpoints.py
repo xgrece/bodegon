@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app import crud, schemas
+
 from fastapi.templating import Jinja2Templates
 
 # Crear un router principal
@@ -21,9 +22,11 @@ def get_db():
 
 #=============================== CLIENTES ================================================
 
+@router.get("/crear_cliente", response_class=HTMLResponse)
+async def show_create_cliente_form(request: Request):
+    return templates.TemplateResponse("crear_cliente.html", {"request": request})
 
-# Crear un cliente (POST)
-@router.post("/clientes/", response_class=HTMLResponse, tags=["Clientes"])
+@router.post("/crear_cliente", response_class=HTMLResponse)
 async def create_cliente(
     request: Request,
     nombre: str = Form(...),
@@ -33,24 +36,27 @@ async def create_cliente(
 ):
     cliente_data = schemas.ClienteCreate(nombre=nombre, apellido=apellido, email=email)
     cliente = crud.create_cliente(db, cliente_data)
-    return templates.TemplateResponse("cliente.html", {"request": request, "cliente": cliente})
+    return templates.TemplateResponse("crear_cliente.html", {
+        "request": request, 
+        "message": f"Cliente {nombre} {apellido} creado exitosamente"
+    })
+    
+@router.get("/read_clientes", response_class=HTMLResponse)
+async def read_clientes(request: Request, db: Session = Depends(get_db)):
+    clientes = crud.get_all_clientes(db)
+    return templates.TemplateResponse("read_clientes.html", {"request": request, "clientes": clientes})
 
-# Leer un cliente (GET)
-@router.get("/clientes/{cliente_id}", response_class=HTMLResponse, tags=["Clientes"])
-async def read_cliente(request: Request, cliente_id: int, db: Session = Depends(get_db)):
+# Obtener un cliente por ID (GET)
+@router.get("/clientes/{cliente_id}", response_class=HTMLResponse)
+async def get_cliente_by_id(request: Request, cliente_id: int, db: Session = Depends(get_db)):
     cliente = crud.get_cliente(db, cliente_id)
     if cliente is None:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
-    return templates.TemplateResponse("cliente.html", {"request": request, "cliente": cliente})
+    # Asumiendo que `cliente` es un objeto HTML que se puede renderizar
+    return HTMLResponse(content=f"<html><body><h1>Cliente {cliente_id}</h1><p>{cliente}</p></body></html>")
 
-# Leer todos los clientes (GET)
-@router.get("/clientes/", response_class=HTMLResponse, tags=["Clientes"])
-async def read_all_clientes(request: Request, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    clientes = crud.get_all_clientes(db, skip=skip, limit=limit)
-    return templates.TemplateResponse("clientes.html", {"request": request, "clientes": clientes})
-
-# Actualizar un cliente (PUT)
-@router.put("/clientes/{cliente_id}", response_class=HTMLResponse, tags=["Clientes"])
+# Actualizar un cliente (POST)
+@router.post("/clientes/{cliente_id}/actualizar", response_class=HTMLResponse)
 async def update_cliente(
     request: Request,
     cliente_id: int,
@@ -63,17 +69,17 @@ async def update_cliente(
     cliente = crud.update_cliente(db, cliente_id, cliente_data)
     if cliente is None:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
-    return templates.TemplateResponse("cliente.html", {"request": request, "cliente": cliente})
+    return templates.TemplateResponse("clientes.html", {"request": request, "message": f"Cliente {nombre} {apellido} actualizado correctamente"})
 
-# Eliminar un cliente (DELETE)
-@router.delete("/clientes/{cliente_id}", response_class=HTMLResponse, tags=["Clientes"])
-async def delete_cliente(request: Request, cliente_id: int, db: Session = Depends(get_db)):
-    crud.delete_cliente(db, cliente_id)
-    return templates.TemplateResponse("clientes.html", {"request": request, "message": "Cliente eliminado"})
+# Eliminar un cliente (POST)
+@router.post("/clientes/{cliente_id}/eliminar", response_class=HTMLResponse)
+async def delete_cliente(cliente_id: int, db: Session = Depends(get_db)):
+    result = crud.delete_cliente(db, cliente_id)
 
-
-
-
+    if result.get("status") == "success":
+        return HTMLResponse(content="Cliente eliminado", status_code=200)
+    else:
+        return HTMLResponse(content="Error al eliminar el cliente", status_code=400)
 
 #======================================= MESAS ========================================
 @router.post("/mesas/", response_class=HTMLResponse, tags=["Mesas"])

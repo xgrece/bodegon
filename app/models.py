@@ -5,7 +5,7 @@ from .database import Base
 
 
 
-#---------------------- C L I E N T E ----------------------------------------------------
+#==================================== C L I E N T E S ========================================
 class Cliente(Base):
     __tablename__ = 'clientes'
     id = Column(Integer, primary_key=True, index=True)
@@ -44,7 +44,7 @@ class Cliente(Base):
         session.delete(self)
         session.commit() 
 
-#---------------------- M E S A ----------------------------------------------------------
+#===================================== M E S A S ========================================
 class Mesa(Base):
     __tablename__ = 'mesas'
     id = Column(Integer, primary_key=True, index=True)
@@ -83,7 +83,7 @@ class Mesa(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- R E S E R V A ----------------------------------------------------
+#===================================== R E S E R V A S ========================================
 class Reserva(Base):
     __tablename__ = 'reservas'
     id = Column(Integer, primary_key=True, index=True)
@@ -123,7 +123,7 @@ class Reserva(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- C O M B O --------------------------------------------------------
+#====================================== C O M B O S ========================================
 class Combo(Base):
     __tablename__ = 'combos'
     id = Column(Integer, primary_key=True, index=True)
@@ -160,7 +160,7 @@ class Combo(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- P E D I D O ------------------------------------------------------
+#================================== P E D I D O S ========================================
 class Pedido(Base):
     __tablename__ = 'pedidos'
     id = Column(Integer, primary_key=True, index=True)
@@ -202,7 +202,7 @@ class Pedido(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- METODO P A G O ---------------------------------------------------
+#============================== METODOS PAGO ========================================
 class MetodoPago(Base):
     __tablename__ = 'metodos_pago'
     id = Column(Integer, primary_key=True, index=True)
@@ -237,7 +237,7 @@ class MetodoPago(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- P A G O ----------------------------------------------------------
+#=================================== P A G O S ========================================
 class Pago(Base):
     __tablename__ = 'pagos'
     id = Column(Integer, primary_key=True, index=True)
@@ -276,7 +276,7 @@ class Pago(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- E M P L E A D O --------------------------------------------------
+#=========================== E M P L E A D O S ========================================
 class Empleado(Base):
     __tablename__ = 'empleados'
     id = Column(Integer, primary_key=True, index=True)
@@ -313,7 +313,7 @@ class Empleado(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- P R O V E E D O R ------------------------------------------------
+#============================= P R O V E E D O R E S ========================================
 class Proveedor(Base):
     __tablename__ = 'proveedores'
     id = Column(Integer, primary_key=True, index=True)
@@ -352,7 +352,7 @@ class Proveedor(Base):
         session.delete(self)
         session.commit()
 
-#---------------------- I N V E N T A R I O ----------------------------------------------
+#=================================== I N V E N T A R I O ========================================
 class Inventario(Base):
     __tablename__ = 'inventario'
     id = Column(Integer, primary_key=True, index=True)

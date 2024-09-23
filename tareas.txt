@@ -1,0 +1,6 @@
+- agregar los datos que faltan a la creacion de clientes y que se muestren
+- hacer todo de nuevo pero para mesas
+- agregar foto de restaurant de fondo en el menu
+- eliminar del menu los botones que no me sirven 
+- agregar las demas tablas y que coincidan con los schemas
+- hacer el login al comienzo (al final del trabajo)

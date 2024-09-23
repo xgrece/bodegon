@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Clientes</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Lista de Clientes</h1>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/crear_cliente">Crear Cliente</a></li>
+      </ul>
+    </nav>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Email</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cliente in clientes %}
+        <tr>
+          <td>{{ cliente.id }}</td>
+          <td>{{ cliente.nombre }}</td>
+          <td>{{ cliente.apellido }}</td>
+          <td>{{ cliente.email }}</td>
+          <td>
+            <button onclick="showUpdateForm('{{ cliente.id }}')">Actualizar</button>
+            <button onclick="showDeleteForm('{{ cliente.id }}')">Eliminar</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Formulario de actualización -->
+    <div id="updateForm" style="display: none">
+      <h2>Actualizar Cliente</h2>
+      <form action="/clientes/update" method="post">
+        <input type="hidden" id="updateId" name="id" />
+        <div class="acomodar-input">
+          <label for="updateNombre">Nombre:</label>
+          <input type="text" id="updateNombre" name="nombre" />
+        </div>
+        <div class="acomodar-input">
+          <label for="updateApellido">Apellido:</label>
+          <input type="text" id="updateApellido" name="apellido" />
+        </div>
+        <div class="acomodar-input">
+          <label for="updateEmail">Email:</label>
+          <input type="email" id="updateEmail" name="email" />
+        </div>
+        <div class="botones-act-dele">
+          <button type="submit">Actualizar</button>
+          <button class="pis" type="button" onclick="hideUpdateForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Formulario de eliminación -->
+
+    <div id="deleteForm" style="display: none">
+      <h2>Eliminar Cliente</h2>
+      <form id="deleteClienteForm" method="post">
+        <input type="hidden" id="deleteId" name="id" />
+        <p class="parrafo">¿Estás seguro de que deseas eliminar este cliente?</p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarCliente()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function showDeleteForm(id) {
+        document.getElementById("deleteId").value = id;
+        document.getElementById("deleteForm").style.display = "block";
+        document.getElementById("updateForm").style.display = "none";
+      }
+
+      function hideDeleteForm() {
+        document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function eliminarCliente() {
+        const clienteId = document.getElementById("deleteId").value;
+
+        fetch(`/clientes/${clienteId}/eliminar`, {
+          method: "POST",
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Redirige a /read_clientes para actualizar la lista después de eliminar
+              window.location.href = "/read_clientes";
+            } else {
+              console.error("Error al eliminar el cliente");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>

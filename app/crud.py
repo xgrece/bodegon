@@ -4,42 +4,43 @@ from .schemas import ClienteCreate, ClienteUpdate, MesaCreate, MesaUpdate, Pedid
 from app import models, schemas
 from sqlalchemy.exc import IntegrityError
 
+#==================================== C L I E N T E S ========================================
 
-def create_cliente(db: Session, cliente_data: schemas.ClienteCreate):
-    nuevo_cliente = models.Cliente(**cliente_data.dict())
-    db.add(nuevo_cliente)
-    try:
-        db.commit()
-        db.refresh(nuevo_cliente)
-        return nuevo_cliente
-    except IntegrityError:
-        db.rollback()
-        raise ValueError(f"El cliente con el email {cliente_data.email} ya existe.")
-
+def create_cliente(db: Session, cliente: schemas.ClienteCreate):
+    db_cliente = models.Cliente(nombre=cliente.nombre, apellido=cliente.apellido, email=cliente.email)
+    db.add(db_cliente)
+    db.commit()
+    db.refresh(db_cliente)
+    return db_cliente
 
 def get_cliente(db: Session, cliente_id: int):
-    return db.query(Cliente).filter(Cliente.id == cliente_id).first()
+    return db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
 def get_all_clientes(db: Session, skip: int = 0, limit: int = 10):
     return db.query(Cliente).offset(skip).limit(limit).all()
 
-def update_cliente(db: Session, cliente_id: int, cliente_data: ClienteUpdate):
-    db_cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
+def update_cliente(db: Session, cliente_id: int, cliente_data: schemas.ClienteUpdate):
+    db_cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
     if db_cliente:
-        for key, value in cliente_data.items():
-            setattr(db_cliente, key, value)
+        db_cliente.nombre = cliente_data.nombre
+        db_cliente.apellido = cliente_data.apellido
+        db_cliente.email = cliente_data.email
         db.commit()
         db.refresh(db_cliente)
         return db_cliente
     return None
 
 def delete_cliente(db: Session, cliente_id: int):
-    db_cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
-    if db_cliente:
-        db.delete(db_cliente)
-        db.commit()
-        return {"message": "Cliente eliminado"}
-    return {"message": "Cliente no encontrado"}
+    cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
+    if not cliente:
+        return {"status": "error", "message": "Cliente no encontrado"}
+    
+    db.delete(cliente)
+    db.commit()
+    
+    return {"status": "success", "message": "Cliente eliminado correctamente"}
+
+#===================================== M E S A S ========================================
 
 def create_mesa(db: Session, mesa_data: schemas.MesaCreate):
     db_mesa = models.Mesa(**mesa_data.dict())
@@ -70,6 +71,8 @@ def delete_mesa(db: Session, mesa_id: int):
         db.delete(db_mesa)
         db.commit()
         
+        
+#================================== P E D I D O S ========================================       
         
 def create_pedido(db: Session, pedido_data: PedidoCreate):
     db_pedido = Pedido(**pedido_data.dict())

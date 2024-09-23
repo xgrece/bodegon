@@ -2,11 +2,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date, time
 
-#---------------------- S C H E M A S ----------------------------------------------------
+#===================================== S C H E M A S ========================================
 
 
 
-#---------------------- C L I E N T E ----------------------------------------------------
+#==================================== C L I E N T E S ========================================
 class ClienteBase(BaseModel):
     nombre: str
     apellido: str
@@ -26,7 +26,7 @@ class Cliente(ClienteBase):
     class Config:
         from_attributes = True
 
-#---------------------- M E S A ----------------------------------------------------------
+#===================================== M E S A S ========================================
 class MesaBase(BaseModel):
     numero_mesa: int
     capacidad: int
@@ -45,7 +45,7 @@ class Mesa(MesaBase):
     class Config:
         from_attributes = True
 
-#---------------------- R E S E R V A ----------------------------------------------------
+#===================================== R E S E R V A S ========================================
 class ReservaBase(BaseModel):
     fecha: date
     hora: time
@@ -65,7 +65,7 @@ class Reserva(ReservaBase):
     class Config:
         from_attributes = True
 
-#---------------------- C O M B O --------------------------------------------------------
+#====================================== C O M B O S ========================================
 class ComboBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
@@ -82,7 +82,7 @@ class Combo(ComboBase):
     class Config:
         from_attributes = True
 
-#---------------------- P E D I D O ------------------------------------------------------
+#================================== P E D I D O S ========================================
 class PedidoBase(BaseModel):
     cantidad: int
     producto: str
@@ -102,7 +102,7 @@ class Pedido(PedidoBase):
     class Config:
         from_attributes = True
 
-#---------------------- METODO P A G O ---------------------------------------------------
+#============================== METODOS PAGO ========================================
 class MetodoPagoBase(BaseModel):
     nombre: str
 
@@ -117,7 +117,7 @@ class MetodoPago(MetodoPagoBase):
     class Config:
         from_attributes = True
 
-#---------------------- P A G O ----------------------------------------------------------
+#=================================== P A G O S ========================================
 class PagoBase(BaseModel):
     monto: float
     fecha: date
@@ -134,7 +134,7 @@ class Pago(PagoBase):
     class Config:
         from_attributes = True
 
-#---------------------- E M P L E A D O --------------------------------------------------
+#=========================== E M P L E A D O S ========================================
 class EmpleadoBase(BaseModel):
     nombre: str
     email: str
@@ -153,7 +153,7 @@ class Empleado(EmpleadoBase):
         from_attributes = True
 
 
-#---------------------- P R O V E E D O R ------------------------------------------------
+#============================= P R O V E E D O R E S ========================================
 class ProveedorBase(BaseModel):
     nombre: str
     contacto: Optional[str] = None
@@ -173,7 +173,7 @@ class Proveedor(ProveedorBase):
     class Config:
         from_attributes = True
         
-#---------------------- I N V E N T A R I O ----------------------------------------------
+#=================================== I N V E N T A R I O ========================================
 class InventarioBase(BaseModel):
     producto: str
     cantidad: int
